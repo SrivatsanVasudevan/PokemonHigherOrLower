@@ -5,9 +5,12 @@ import './App.css';
 function App() {
   
   return (
-    <div className="App">
-      <Menu />
+    
+    <div className = "App">
+       <Menu />
     </div>
+   
+    
   );
 }
 

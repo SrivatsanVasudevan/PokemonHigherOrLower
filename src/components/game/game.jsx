@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react';
 import axios from 'axios';
-
+import CountUp from 'react-countup';
+import Menu from '../menu/menu';
 
 const Game = ({stat}) => {
     const urlAllPokemon = 'https://pokeapi.co/api/v2/pokemon?limit=151&offset=0';
@@ -10,15 +11,16 @@ const Game = ({stat}) => {
     const [secondPokemon, setSecondPokemon] = useState('');
     const [pokeStatsOne, setPokeStatsOne] = useState([]);
     const [pokeStatsTwo, setPokeStatsTwo] = useState([]);
-    const [firstStat, setFirstStat] = useState(0);
-    const [secondStat, setSecondStat] = useState(0);
     const [points,setPoints] = useState(0);
     const [finalPoints, setFinalPoints] = useState(0);
     const [displayStat, setDisplayStat] = useState(false);
+    const [animatedStat, setAnimatedStat] = useState(0);
+    const [resetGame, setResetGame] = useState(false);
 
     const startGame = () => {
-        const initialPokemon = getTwoRandomPokemon();
         
+        const initialPokemon = getTwoRandomPokemon();
+        setAnimatedStat(0);
         axios.get(urlPokemon.concat(`${initialPokemon[0]}`))
         .then(response =>  {
             setFirstPokemon(response.data.name);
@@ -64,7 +66,9 @@ const Game = ({stat}) => {
     const nextRound = () => {
         
         console.log('correct answer!')
-        axios.get(urlPokemon.concat(secondPokemon))
+        setTimeout(() => {
+            setPoints(points+1);
+            axios.get(urlPokemon.concat(secondPokemon))
         .then(response => {
             setFirstPokemon(response.data.name);
             setPokeStatsOne(response.data.stats.map((poke,index)=>{
@@ -81,7 +85,9 @@ const Game = ({stat}) => {
                 return poke.base_stat;
             }))
         })
-
+        setAnimatedStat(0);
+        }, 2000)
+        
     }
     
 
@@ -95,6 +101,10 @@ const Game = ({stat}) => {
         let random = Math.floor(Math.random()*pokemon.length);
 
         return pokemon[random];
+    }
+
+    const menuScreen = () => {
+        setResetGame(true);
     }
 
     const checkHigher = () => {
@@ -112,16 +122,22 @@ const Game = ({stat}) => {
         console.log(statOne, statTwo);
         console.log('hey')
         console.log(checkRange);
+        setAnimatedStat(statTwo);
         if(checkRange){
             setDisplayStat(true);
-            setPoints(points+1);
+            
+            
             nextRound();
         }
         else{
+            setTimeout(() => {
             setFinalPoints(points);
             setFirstPokemon('');
             setSecondPokemon('');
+            
             setPoints(0);
+            },2000);
+            
         }
     }
     const checkLower = () => {
@@ -136,16 +152,21 @@ const Game = ({stat}) => {
         }
         console.log(statOne, statTwo);
         console.log('low hey')
+        setAnimatedStat(statTwo);
         if(checkRange){
             setDisplayStat(true);
-            setPoints(points+1);
+            
             nextRound();
         }
         else{
-            setFinalPoints(points);
-            setFirstPokemon('');
-            setSecondPokemon('');
-            setPoints(0);
+            setTimeout(()=>{
+                setFinalPoints(points);
+                setFirstPokemon('');
+                setSecondPokemon('');
+                
+                setPoints(0);
+            },2000);
+            
         }
         
     }
@@ -161,18 +182,19 @@ const Game = ({stat}) => {
     
     return (
         
-        <>
+        <>{!resetGame?
             <div>
                 <h1> {stat} </h1>
                 
                 { !secondPokemon ? <button onClick = {startGame} > Start Game! </button> : null}
+                {!secondPokemon ? <button onClick = {menuScreen}> Reset Game </button> : null}
                 { !firstPokemon ? null :<p> {firstPokemon} {stat}: {getStat(stat,pokeStatsOne)} </p>}
-                { !secondPokemon ? null : <p> {secondPokemon}  </p>}
+                { !secondPokemon ? null : <p> {secondPokemon} {animatedStat !== 0 ?<CountUp end = {animatedStat} duration = {0.5} /> : null}   </p>}
                 { !firstPokemon ? null :<button onClick = {checkHigher}> Higher </button>}
                 { !firstPokemon ? null :<button onClick = {checkLower}> Lower </button>}
-                {finalPoints!== 0 ? `Your score is: ${finalPoints}` : <div> Points: {points} </div>}
+                {finalPoints!== 0 ? <div> Your score is: {finalPoints}</div> : <div> Points: {points} </div>}
             </div>
-
+        :<Menu />}
         </>
     )
 }
