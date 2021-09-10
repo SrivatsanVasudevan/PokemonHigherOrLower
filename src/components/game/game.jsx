@@ -2,6 +2,7 @@ import React, {useState,useEffect} from 'react';
 import axios from 'axios';
 import CountUp from 'react-countup';
 import Menu from '../menu/menu';
+import './game.scss';
 
 const Game = ({stat}) => {
     const urlAllPokemon = 'https://pokeapi.co/api/v2/pokemon?limit=151&offset=0';
@@ -16,6 +17,8 @@ const Game = ({stat}) => {
     const [displayStat, setDisplayStat] = useState(false);
     const [animatedStat, setAnimatedStat] = useState(0);
     const [resetGame, setResetGame] = useState(false);
+    const [pokemonImageOne, setPokemonImageOne] = useState('');
+    const [pokemonImageTwo, setPokemonImageTwo] = useState('');
 
     const startGame = () => {
         
@@ -27,6 +30,7 @@ const Game = ({stat}) => {
             setPokeStatsOne(response.data.stats.map((poke,index)=>{
                 return poke.base_stat;
             }))
+            setPokemonImageOne(response.data.sprites.front_default);
         })
         axios.get(urlPokemon.concat(`${initialPokemon[1]}`))
         .then(response => {
@@ -34,6 +38,7 @@ const Game = ({stat}) => {
             setPokeStatsTwo(response.data.stats.map((poke,index)=>{
                 return poke.base_stat;
             }));
+            setPokemonImageTwo(response.data.sprites.front_default);
             
         })
         setFinalPoints(0);
@@ -74,6 +79,7 @@ const Game = ({stat}) => {
             setPokeStatsOne(response.data.stats.map((poke,index)=>{
                 return poke.base_stat;
             }))
+            setPokemonImageOne(response.data.sprites.front_default);
         })
 
         
@@ -84,6 +90,7 @@ const Game = ({stat}) => {
             setPokeStatsTwo(response.data.stats.map((poke,index)=>{
                 return poke.base_stat;
             }))
+            setPokemonImageTwo(response.data.sprites.front_default);
         })
         setAnimatedStat(0);
         }, 2000)
@@ -184,14 +191,26 @@ const Game = ({stat}) => {
         
         <>{!resetGame?
             <div>
-                <h1> {stat} </h1>
+                <h1> Pokemon - Higher or Lower </h1>
+                <h3> {stat} </h3>
                 
-                { !secondPokemon ? <button onClick = {startGame} > Start Game! </button> : null}
-                {!secondPokemon ? <button onClick = {menuScreen}> Reset Game </button> : null}
-                { !firstPokemon ? null :<p> {firstPokemon} {stat}: {getStat(stat,pokeStatsOne)} </p>}
-                { !secondPokemon ? null : <p> {secondPokemon} {animatedStat !== 0 ?<CountUp end = {animatedStat} duration = {0.5} /> : null}   </p>}
-                { !firstPokemon ? null :<button onClick = {checkHigher}> Higher </button>}
-                { !firstPokemon ? null :<button onClick = {checkLower}> Lower </button>}
+                { !secondPokemon ? <button className = "buttons" onClick = {startGame} > Start Game! </button> : null}
+                {!secondPokemon ? <button className = "buttons" onClick = {menuScreen}> Reset Game </button> : null}
+                {<div className = "flex-container" >
+                { !firstPokemon ? null :<div> {firstPokemon} </div>}
+                { !secondPokemon ? null : <div> {secondPokemon}</div>}
+                </div>}{<div className = "flex-container">
+                {! firstPokemon ? null : <div><img src = {pokemonImageOne} alt = ''/></div>}
+                {!secondPokemon ? null : <div><img src = {pokemonImageTwo} alt = '' /></div>}
+                </div>}
+                {
+                    <div className = "flex-container">
+                        {!firstPokemon ? null : <div> {stat}: {getStat(stat,pokeStatsOne)} </div>}
+                        {!secondPokemon ? null : <div> {stat}: {animatedStat === 0 ? null : <CountUp end = {animatedStat} duration = {0.5} />}</div>}
+                    </div>
+                }
+                { !firstPokemon ? null :<button className = "buttons" onClick = {checkHigher}> Higher </button>}
+                { !firstPokemon ? null :<button className = "buttons" onClick = {checkLower}> Lower </button>}
                 {finalPoints!== 0 ? <div> Your score is: {finalPoints}</div> : <div> Points: {points} </div>}
             </div>
         :<Menu />}
