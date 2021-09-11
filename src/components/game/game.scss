@@ -1,5 +1,19 @@
 .buttons{
+    background-color: transparent;
+    outline: none;
     margin: 10px;
+    border: "0px solid black";
+    border-radius: 20px;
+    padding-left: 50px;
+    padding-right:50px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+
+    &:hover{
+        cursor:pointer;
+        background-color: white;
+        
+    }
 }
 
 .flex-container{
@@ -8,7 +22,15 @@
     justify-content: space-evenly;
 }
 
-.flex-container > div{
+.pokemonImages{
+    width: 300px;
+    height: 'auto'; 
     
-}
+    border: "0px solid black";
+    border-radius:10px;
 
+    &:hover{
+        cursor: pointer;
+        transform: scale(1.2);
+    }
+}
