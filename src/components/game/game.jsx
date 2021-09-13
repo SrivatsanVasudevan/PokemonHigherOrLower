@@ -4,9 +4,13 @@ import CountUp from 'react-countup';
 import Menu from '../menu/menu';
 import './game.scss';
 import styled,{keyframes} from 'styled-components';
-import {fadeOutLeftBig} from 'react-animations';
-//const NameSlide = styled.div`animation: 1.5s ${keyframes `${lightSpeedOut}`} `;
-const Slide = styled.div`animation: 4.7s ${keyframes `${fadeOutLeftBig}`} `;
+import {fadeOutLeftBig, fadeOut} from 'react-animations';
+import {Checkmark} from 'react-checkmark';
+
+
+const Slide = styled.div`animation: 4.6s ${keyframes `${fadeOutLeftBig}`} `;
+const NameSlide = styled.div`animation: 5.5s ${keyframes `${fadeOutLeftBig}`} `;
+const FadeOut = styled.div`animation: 1s ${keyframes `${fadeOut}`}`;
 const Game = ({stat}) => {
     const urlAllPokemon = 'https://pokeapi.co/api/v2/pokemon?limit=151&offset=0';
     const urlPokemon = 'https://pokeapi.co/api/v2/pokemon/';
@@ -22,14 +26,12 @@ const Game = ({stat}) => {
     const [resetGame, setResetGame] = useState(false);
     const [pokemonImageOne, setPokemonImageOne] = useState('');
     const [pokemonImageTwo, setPokemonImageTwo] = useState('');
+    const [checkMarkAnimation, setCheckMarkAnimation] = useState(false);
 
     const capitalize = (string) => {
         return string.toUpperCase();
     }
-
     
-   
-
     const startGame = () => {
         
         const initialPokemon = getTwoRandomPokemon();
@@ -80,10 +82,16 @@ const Game = ({stat}) => {
     const nextRound = () => {
         
         console.log('correct answer!')
+
         
         setTimeout(() => {
+            setCheckMarkAnimation(true);
+            
+        },500)
+        setTimeout(()=> {
+            setCheckMarkAnimation(false);
             setDisplayStat(true);
-        },1000)
+        },2500)
 
         setTimeout(() => {
             
@@ -108,8 +116,9 @@ const Game = ({stat}) => {
             setPokemonImageTwo(response.data.sprites.front_default);
         })
         setAnimatedStat(0);
+        setCheckMarkAnimation(false);
         setDisplayStat(false);
-        }, 2000)
+        }, 3500)
         
     }
     
@@ -142,22 +151,22 @@ const Game = ({stat}) => {
         else{
             checkRange = false;
         }
-        console.log(statOne, statTwo);
-        console.log('hey')
-        console.log(checkRange);
+        console.log('hi',checkRange);
         setAnimatedStat(statTwo);
         if(checkRange){
-            //setDisplayStat(true);
             nextRound();
         }
         else{
+           
+            
             setTimeout(() => {
             setFinalPoints(points);
             setFirstPokemon('');
             setSecondPokemon('');
-            
             setPoints(0);
             },2000);
+            
+            
             
         }
     }
@@ -171,21 +180,24 @@ const Game = ({stat}) => {
         else{
             checkRange = false;
         }
-        console.log(statOne, statTwo);
-        console.log('low hey')
+        //console.log(statOne, statTwo);
+        console.log('hi',checkRange);
         setAnimatedStat(statTwo);
         if(checkRange){
-            //setDisplayStat(true);
+            
             nextRound();
         }
         else{
+            
             setTimeout(()=>{
+                
                 setFinalPoints(points);
                 setFirstPokemon('');
                 setSecondPokemon('');
-                
                 setPoints(0);
+                
             },2000);
+            
             
         }
         
@@ -208,26 +220,30 @@ const Game = ({stat}) => {
                 <h3> {stat} </h3>
                 
                 { !secondPokemon ? <button className = "buttons" onClick = {startGame} > Start Game! </button> : null}
-                {!secondPokemon ? <button className = "buttons" onClick = {menuScreen}> Reset Game </button> : null}
-                {<div className = "flex-container" >
-                { !firstPokemon ? null : displayStat ? <Slide><div> {capitalize(firstPokemon)} </div></Slide> : <div> {capitalize(firstPokemon)}  </div>}
-                { !secondPokemon ? null : displayStat ? <Slide><div> {capitalize(secondPokemon)}</div> </Slide> : <div> {capitalize(secondPokemon)} </div>}
-                </div>}{<div className = "flex-container">
+                {!secondPokemon ? <button className = "buttons" onClick = {menuScreen}> Main Menu </button> : null}
+                
+                {<div className = "flex-container">
                 {! firstPokemon ? null : displayStat ? <Slide> <div ><img className = "pokemonImages" src = {pokemonImageOne} alt = ''/></div> </Slide> : <div ><img className = "pokemonImages" src = {pokemonImageOne} alt = ''/></div>}
+                {checkMarkAnimation ?<div><Checkmark /></div>: <div></div>}
                 {!secondPokemon ? null : displayStat ? <Slide> <div ><img className = "pokemonImages" src = {pokemonImageTwo} alt = '' /></div> </Slide> : <div ><img className = "pokemonImages" src = {pokemonImageTwo} alt = '' /></div>}
                 </div>}
+                {<div className = "flex-container" >
+                { !firstPokemon ? null : displayStat ? <div style = {{fontSize:30, fontWeight: 'bold'}}><NameSlide> {capitalize(firstPokemon)} </NameSlide></div> : <div style = {{fontSize:30, fontWeight: 'bold'}}> {capitalize(firstPokemon)}  </div>}
+                { !secondPokemon ? null : displayStat ? <div style = {{fontSize:30, fontWeight: 'bold' }}><NameSlide> {capitalize(secondPokemon)} </NameSlide></div> : <div style = {{fontSize:30, fontWeight: 'bold'}}> {capitalize(secondPokemon)} </div>}
+                </div>}
+
                 {
                     <div className = "flex-container">
-                        {!firstPokemon ? null : <div> {capitalize(stat)}: {getStat(stat,pokeStatsOne)} </div>}
-                        {!secondPokemon ? null : <div> {capitalize(stat)}: {animatedStat === 0 ? null : <CountUp end = {animatedStat} duration = {0.5} />}</div>}
+                        {!firstPokemon ? null : !displayStat?  <div style = {{fontSize:20}}> {capitalize(stat)}: {getStat(stat,pokeStatsOne)} </div> : <NameSlide><div style = {{fontSize:20}}> {capitalize(stat)}: {getStat(stat,pokeStatsOne)} </div></NameSlide>}
+                        {!secondPokemon ? null : !displayStat? <div style = {{fontSize:20}}> {capitalize(stat)}: {animatedStat === 0 ? null : <CountUp end = {animatedStat} duration = {0.5} />}</div> : <NameSlide><div style = {{fontSize:20}}> {capitalize(stat)}: {animatedStat === 0 ? null : <CountUp end = {animatedStat}  />}</div></NameSlide>}
                     </div>
                 }
-                {!firstPokemon ? null : <div> Does {capitalize(secondPokemon)} have higher or lower {capitalize(stat)} than {capitalize(firstPokemon)}? </div>}
-                { !firstPokemon ? null :<button className = "buttons" onClick = {checkHigher}> Higher </button>}
-                { !firstPokemon ? null :<button className = "buttons" onClick = {checkLower}> Lower </button>}
-                {finalPoints!== 0 ? <div> Your score is: {finalPoints}</div> : <div> Points: {points} </div>}
+                {!firstPokemon ? null : !displayStat? <div style = {{fontSize:20}}> Does {capitalize(secondPokemon)} have higher or lower {capitalize(stat)} than {capitalize(firstPokemon)}? </div> : <FadeOut><div style = {{fontSize:20}}> Does {capitalize(secondPokemon)} have higher or lower {capitalize(stat)} than {capitalize(firstPokemon)}? </div></FadeOut>}
+                { !firstPokemon ? null :<button style = {{fontWeight: 'bold',color: 'blue', fontSize:30}} className = "buttons" onClick = {checkHigher}> Higher </button>}
+                { !firstPokemon ? null :<button style = {{fontWeight: 'bold',color:'Crimson', fontSize:30}} className = "buttons" onClick = {checkLower}> Lower </button>}
+                {finalPoints!== 0 ? <div className = "points"> Points: {finalPoints}</div> : <div className = "points"> Points: {points} </div>}
             </div>
-        :<Menu />}
+        :<Menu points = {finalPoints}/>}
         </>
     )
 }
